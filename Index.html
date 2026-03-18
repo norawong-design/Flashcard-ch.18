@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>みんなの日本語 第18課 · 暗記フラッシュカード</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #121212;  /* dark background as requested */
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background-color: #1e1e1e;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px #333;
+            padding: 28px 24px 32px 24px;
+            color: #f0f0f0;
+            transition: all 0.2s;
+        }
+
+        .title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #bb86fc, #7c4dff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .switch-container {
+            display: flex;
+            background: #2a2a2a;
+            border-radius: 40px;
+            padding: 4px;
+            border: 1px solid #3f3f3f;
+        }
+
+        .direction-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: #aaa;
+            transition: 0.15s;
+        }
+
+        .direction-btn.active {
+            background: #7c4dff;
+            color: white;
+            box-shadow: 0 2px 8px rgba(124, 77, 255, 0.4);
+        }
+
+        .main-card {
+            background-color: #242424;
+            border-radius: 28px;
+            padding: 30px 20px;
+            margin-bottom: 28px;
+            border: 1px solid #3b3b3b;
+            box-shadow: inset 0 2px 5px #0f0f0f, 0 8px 12px rgba(0,0,0,0.5);
+        }
+
+        .question {
+            font-size: 3.2rem;
+            font-weight: 600;
+            text-align: center;
+            word-break: break-word;
+            line-height: 1.3;
+            color: #ffffff;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            margin: 10px 0;
+        }
+
+        .answer-section {
+            margin-top: 25px;
+            border-top: 2px dashed #3e3e3e;
+            padding-top: 25px;
+        }
+
+        .answer-hidden {
+            display: none;
+        }
+
+        .answer-visible {
+            display: block;
+            animation: fadeIn 0.25s;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .answer-word {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #cfb3ff;
+            margin-bottom: 16px;
+            word-break: break-word;
+        }
+
+        .example-box {
+            background: #1a1a1a;
+            border-left: 6px solid #7c4dff;
+            padding: 16px 18px;
+            border-radius: 20px;
+            margin: 20px 0 10px;
+            box-shadow: inset 0 0 0 1px #2e2e2e;
+        }
+
+        .example-jp {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .example-en {
+            font-size: 1.1rem;
+            color: #a8a8a8;
+            font-style: italic;
+        }
+
+        .rating-panel {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .rating-btn {
+            flex: 1 1 0;
+            background: #2c2c2c;
+            border: 1px solid #404040;
+            padding: 16px 8px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: 0.15s;
+            min-width: 100px;
+            box-shadow: 0 6px 0 #0f0f0f;
+        }
+
+        .rating-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0f0f0f;
+        }
+
+        .rating-btn.hard {
+            background: #562b2b;
+            border-color: #a05050;
+            color: #ffb3b3;
+        }
+
+        .rating-btn.hard:hover {
+            background: #6e3737;
+        }
+
+        .rating-btn.unsure {
+            background: #5a4a2a;
+            border-color: #b89134;
+            color: #ffe2a3;
+        }
+
+        .rating-btn.unsure:hover {
+            background: #755f34;
+        }
+
+        .rating-btn.easy {
+            background: #1d4c3b;
+            border-color: #2e9b71;
+            color: #b8ffe0;
+        }
+
+        .rating-btn.easy:hover {
+            background: #256b4e;
+        }
+
+        .view-answer-btn {
+            width: 100%;
+            background: #3d3d3d;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 18px;
+            border-radius: 60px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.1s;
+            border-bottom: 4px solid #1e1e1e;
+            margin: 12px 0 8px;
+            box-shadow: 0 10px 15px -8px black;
+        }
+
+        .view-answer-btn:hover {
+            background: #4e4e4e;
+        }
+
+        .footer-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 0.9rem;
+            margin-top: 24px;
+        }
+
+        .repetition-badge {
+            background: #2a2a2a;
+            padding: 4px 14px;
+            border-radius: 50px;
+            border: 1px solid #3f3f3f;
+        }
+
+        /* spaced repetition counters are hidden — logic works internally */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="flashcardApp">
+    <!-- Title as requested -->
+    <div class="title-bar">
+        <h1>📘 第18課 · フラッシュカード</h1>
+        <div class="switch-container">
+            <button class="direction-btn active" id="btnJpToEn">日本語 → English</button>
+            <button class="direction-btn" id="btnEnToJp">English → 日本語</button>
+        </div>
+    </div>
+
+    <!-- main flashcard area -->
+    <div class="main-card">
+        <div class="question" id="questionDisplay">loading...</div>
+
+        <!-- answer block (hidden by default) -->
+        <div id="answerContainer" class="answer-section answer-hidden">
+            <div class="answer-word" id="answerWord"></div>
+            <div class="example-box">
+                <div class="example-jp" id="exampleJp"></div>
+                <div class="example-en" id="exampleEn"></div>
+            </div>
+        </div>
+
+        <!-- view answer button -->
+        <button class="view-answer-btn" id="viewAnswerBtn">📖 View Answer</button>
+
+        <!-- rating buttons (initially hidden, shown after answer) -->
+        <div class="rating-panel hidden" id="ratingPanel">
+            <button class="rating-btn hard" id="hardBtn">💢 むずかしい<br><small>Hard</small></button>
+            <button class="rating-btn unsure" id="unsureBtn">🤔 ちょっと不安<br><small>Not Sure</small></button>
+            <button class="rating-btn easy" id="easyBtn">🍃 簡単<br><small>Easy</small></button>
+        </div>
+    </div>
+
+    <!-- tiny status: counts / direction (just for show) -->
+    <div class="footer-stats">
+        <span class="repetition-badge" id="remainingCounter">🔁 残り ?</span>
+        <span class="repetition-badge" id="directionHint">日 → 英</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ------------------- vocabulary data (Minna no Nihongo 2nd ed. lesson 18) ----------------
+        const vocabulary = [
+            { jp: "できます", en: "can do; be able to", sampleJp: "ピアノができます。", sampleEn: "I can play piano." },
+            { jp: "わかります", en: "understand", sampleJp: "日本語がわかります。", sampleEn: "I understand Japanese." },
+            { jp: "あります", en: "have (characteristic)", sampleJp: "趣味は写真です。", sampleEn: "My hobby is photography." }, // adjusted for context
+            { jp: "すき", en: "like", sampleJp: "音楽がすきです。", sampleEn: "I like music." },
+            { jp: "きらい", en: "dislike", sampleJp: "虫がきらいです。", sampleEn: "I dislike insects." },
+            { jp: "じょうず", en: "skillful / good at", sampleJp: "料理がじょうずです。", sampleEn: "I'm good at cooking." },
+            { jp: "へた", en: "poor / bad at", sampleJp: "歌うのがへたです。", sampleEn: "I'm bad at singing." },
+            { jp: "とくい", en: "strong point", sampleJp: "水泳がとくいです。", sampleEn: "I'm good at swimming." },
+            { jp: "にがて", en: "weak point", sampleJp: "数学がにがてです。", sampleEn: "I'm weak in math." },
+            { jp: "げんき", en: "healthy; energetic", sampleJp: "おげんきですか。", sampleEn: "How are you?" },
+            { jp: "しっています", en: "know", sampleJp: "あの方をしっています。", sampleEn: "I know that person." },
+            { jp: "はじめて", en: "for the first time", sampleJp: "はじめてすしをたべました。", sampleEn: "I ate sushi for the first time." },
+            { jp: "しかし", en: "but; however", sampleJp: "寒いです。しかし、元気です。", sampleEn: "It's cold; however, I'm fine." },
+            { jp: "どんな", en: "what kind of", sampleJp: "どんな音楽がすきですか。", sampleEn: "What kind of music do you like?" },
+            { jp: "どれ", en: "which one", sampleJp: "あなたの本はどれですか。", sampleEn: "Which one is your book?" },
+            { jp: "本当に", en: "really", sampleJp: "本当にすごいですね。", sampleEn: "That's really amazing." },
+            { jp: "あまり", en: "not much (with neg.)", sampleJp: "あまりわかりません。", sampleEn: "I don't understand much." },
+            { jp: "たくさん", en: "a lot", sampleJp: "写真をたくさんとりました。", sampleEn: "I took a lot of photos." }
+        ];
+
+        // --- extend a few more to make chapter feel complete (can be adjusted)
+        const extra = [
+            { jp: "よく", en: "well; often", sampleJp: "よく映画をみます。", sampleEn: "I often watch movies." },
+            { jp: "だんだん", en: "gradually", sampleJp: "だんだん寒くなります。", sampleEn: "It's getting colder gradually." },
+        ];
+        const fullVocab = vocabulary.concat(extra);
+
+        // ---------- spaced repetition queue ----------
+        class SRSCard {
+            constructor(item) {
+                this.item = item;               // {jp, en, sampleJp, sampleEn}
+                this.interval = 0;               // 0 = new, will be set after first rating
+                this.duePosition = 0;             // position in the list (approx) — we'll manage with array indices
+            }
+        }
+
+        // state
+        let cards = fullVocab.map(v => new SRSCard(v));
+        let currentIndex = 0;                 // index of card to show next
+        let showingAnswer = false;
+        let direction = 'jp-en';               // 'jp-en' or 'en-jp'
+
+        // shuffle cards once (word order is random)
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        cards = shuffleArray(cards);
+
+        // re-position due: we actually maintain a simple list, after rating we reinsert at future position.
+        // For clarity, we treat cards array as a linear queue.
+        // Rating: hard → come back after 3 cards, unsure → after 7, easy → after 25.
+        // Implementation: remove card from current position, compute new index = currentIndex + offset (wrapping? but we will just splice)
+        // simpler: push to later position (cyclic). but we need to keep due order. we'll manage by moving the card forward.
+        function rateCurrentCard(rating) {
+            if (!showingAnswer || cards.length === 0) return;
+
+            const card = cards[currentIndex];
+            let offset = 0;
+            if (rating === 'hard') offset = 3;
+            else if (rating === 'unsure') offset = 7;
+            else if (rating === 'easy') offset = 25;
+
+            // Remove card at currentIndex
+            cards.splice(currentIndex, 1);
+
+            // new position = currentIndex + offset (but after removal the list shrinks, careful)
+            // if currentIndex is beyond last? recalc
+            let insertPos = currentIndex + offset - 1; // because we removed one, the next items shift. Let's do simple: 
+            // after removal, we want to place the card "offset" steps later from the currentIndex (same as before removal)
+            // easier: reinsert at position = min(currentIndex + offset, cards.length) (after removal, cards.length decreased by 1)
+            if (cards.length === 0) {
+                cards = [card]; // only card left
+                currentIndex = 0;
+            } else {
+                let targetPos = Math.min(currentIndex + offset, cards.length);
+                cards.splice(targetPos, 0, card);
+                // after insertion, currentIndex should point to next card (the one originally after the removed one)
+                // but if we inserted before currentIndex we must adjust? we inserted at targetPos >= currentIndex (since offset>=3) so no problem.
+                // currentIndex stays at same index (now points to what used to be at currentIndex+1)
+                if (currentIndex >= cards.length) currentIndex = cards.length - 1;
+            }
+
+            // after rating, go to next card (show new front)
+            showingAnswer = false;
+            updateDisplay();
+
+            // if the list is not empty, ensure currentIndex within bounds
+            if (cards.length > 0 && currentIndex >= cards.length) currentIndex = 0;
+            updateRemaining();
+        }
+
+        // UI elements
+        const questionEl = document.getElementById('questionDisplay');
+        const answerContainer = document.getElementById('answerContainer');
+        const answerWordEl = document.getElementById('answerWord');
+        const exampleJpEl = document.getElementById('exampleJp');
+        const exampleEnEl = document.getElementById('exampleEn');
+        const viewAnswerBtn = document.getElementById('viewAnswerBtn');
+        const ratingPanel = document.getElementById('ratingPanel');
+        const btnJpToEn = document.getElementById('btnJpToEn');
+        const btnEnToJp = document.getElementById('btnEnToJp');
+        const directionHint = document.getElementById('directionHint');
+        const remainingSpan = document.getElementById('remainingCounter');
+
+        function updateRemaining() {
+            remainingSpan.textContent = `🔁 残り ${cards.length} 枚`;
+        }
+
+        // display current card based on direction & showingAnswer
+        function updateDisplay() {
+            if (!cards.length) {
+                questionEl.textContent = "🎉 おわりです！";
+                answerContainer.classList.add('answer-hidden');
+                answerContainer.classList.remove('answer-visible');
+                viewAnswerBtn.disabled = true;
+                ratingPanel.classList.add('hidden');
+                return;
+            }
+
+            const card = cards[currentIndex];
+            const item = card.item;
+
+            // question part
+            if (direction === 'jp-en') {
+                questionEl.textContent = item.jp;
+            } else {
+                questionEl.textContent = item.en;
+            }
+
+            // answer part (hidden unless showingAnswer)
+            if (showingAnswer) {
+                if (direction === 'jp-en') {
+                    answerWordEl.textContent = `🔹 ${item.en}`;
+                } else {
+                    answerWordEl.textContent = `🔹 ${item.jp}`;
+                }
+                exampleJpEl.textContent = `📌 ${item.sampleJp}`;
+                exampleEnEl.textContent = `📌 ${item.sampleEn}`;
+
+                answerContainer.classList.remove('answer-hidden');
+                answerContainer.classList.add('answer-visible');
+                ratingPanel.classList.remove('hidden');
+                viewAnswerBtn.classList.add('hidden'); // hide view button while showing answer
+            } else {
+                answerContainer.classList.add('answer-hidden');
+                answerContainer.classList.remove('answer-visible');
+                ratingPanel.classList.add('hidden');
+                viewAnswerBtn.classList.remove('hidden');
+            }
+
+            directionHint.textContent = direction === 'jp-en' ? '日本語 → English' : 'English → 日本語';
+            updateRemaining();
+        }
+
+        // Event listeners
+        viewAnswerBtn.addEventListener('click', () => {
+            if (!cards.length) return;
+            showingAnswer = true;
+            updateDisplay();
+        });
+
+        document.getElementById('hardBtn').addEventListener('click', () => {
+            rateCurrentCard('hard');
+        });
+        document.getElementById('unsureBtn').addEventListener('click', () => {
+            rateCurrentCard('unsure');
+        });
+        document.getElementById('easyBtn').addEventListener('click', () => {
+            rateCurrentCard('easy');
+        });
+
+        // direction switch
+        btnJpToEn.addEventListener('click', () => {
+            direction = 'jp-en';
+            btnJpToEn.classList.add('active');
+            btnEnToJp.classList.remove('active');
+            showingAnswer = false; // hide answer when switching direction
+            updateDisplay();
+        });
+
+        btnEnToJp.addEventListener('click', () => {
+            direction = 'en-jp';
+            btnEnToJp.classList.add('active');
+            btnJpToEn.classList.remove('active');
+            showingAnswer = false;
+            updateDisplay();
+        });
+
+        // initialize
+        updateDisplay();
+
+        // handle edge: after rating, currentIndex might land on same due to splice; but we also update rating reset showingAnswer
+        // small adjustment: after rateCurrentCard we call updateDisplay, which resets showingAnswer = false already, but need to keep currentIndex valid.
+        // we also might want to show the next card automatically. already done.
+
+        // Additional tweak: if the card list changes drastically, currentIndex might exceed length.
+        // Already inside rateCurrentCard we adjust, and after rating we also call updateDisplay.
+        // But after a rating, we are not automatically advancing to the 'next' index. The queue has shifted: the card that was after the rated card becomes at currentIndex.
+        // That is correct because we removed the rated one, so the same index now holds the next card.
+        // So no extra increment.
+
+        // But after rating we set showingAnswer = false, then updateDisplay() shows the new front card.
+        // Perfect.
+
+        // additional safeguard for 0 cards
+        if (!cards.length) updateDisplay();
+    })();
+</script>
+</body>
+</html>
